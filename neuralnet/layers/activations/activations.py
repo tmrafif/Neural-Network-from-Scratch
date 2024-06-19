@@ -1,6 +1,7 @@
 import numpy as np
 
 from .activation import Activation
+from ..layer import Layer
 
 class Tanh(Activation):
     def __init__(self):
@@ -22,3 +23,14 @@ class Sigmoid(Activation):
             return s * (1 - s)
         
         super().__init__(sigmoid, sigmoid_prime)
+
+class Softmax(Layer):
+    def forward(self, input):
+        tmp = np.exp(input)
+        self.output = tmp / np.sum(tmp, axis=1, keepdims=True)
+        return self.output
+    
+    def backward(self, learning_rate, output_gradient):
+        n = np.size(self.output)
+        inputs_gradient = np.dot((np.identity(n) - self.output.T) * self.output, output_gradient)
+        return inputs_gradient
